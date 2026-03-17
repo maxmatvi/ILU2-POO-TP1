@@ -26,17 +26,25 @@ public class Etal {
 	}
 
 	public String libererEtal() {
-		etalOccupe = false;
-		StringBuilder chaine = new StringBuilder(
-				"Le vendeur " + vendeur.getNom() + " quitte son étal, ");
-		int produitVendu = quantiteDebutMarche - quantite;
-		if (produitVendu > 0) {
-			chaine.append(
-					"il a vendu " + produitVendu + " parmi " + produit + ".\n");
-		} else {
-			chaine.append("il n'a malheureusement rien vendu.\n");
+		try {
+			
+			etalOccupe = false;
+			StringBuilder chaine = new StringBuilder(
+					"Le vendeur " + vendeur.getNom() + " quitte son étal, ");
+			int produitVendu = quantiteDebutMarche - quantite;
+			if (produitVendu > 0) {
+				chaine.append(
+						"il a vendu " + produitVendu + " parmi " + produit + ".\n");
+			} else {
+				chaine.append("il n'a malheureusement rien vendu.\n");
+			}
+			return chaine.toString();
+			
+		} catch (NullPointerException e) {
+			// On capture l'erreur si vendeur est null
+			System.err.println("Erreur : Impossible de libérer un étal qui n'est pas occupé.");
+			return ""; 
 		}
-		return chaine.toString();
 	}
 
 	public String afficherEtal() {
@@ -48,7 +56,17 @@ public class Etal {
 	}
 
 	public String acheterProduit(int quantiteAcheter, Gaulois acheteur) {
-		if (etalOccupe) {
+		// Vérification de la validité de la quantité
+		if (quantiteAcheter < 1) {
+			throw new IllegalArgumentException("La quantité d'achat doit être strictement positive.");
+		}
+		
+		// Vérification de l'état de l'étal
+		if (!etalOccupe) {
+			throw new IllegalStateException("L'étal doit être occupé pour pouvoir acheter.");
+		}
+
+		try {
 			StringBuilder chaine = new StringBuilder();
 			chaine.append(acheteur.getNom() + " veut acheter " + quantiteAcheter
 					+ " " + produit + " à " + vendeur.getNom());
@@ -70,8 +88,12 @@ public class Etal {
 						+ vendeur.getNom() + "\n");
 			}
 			return chaine.toString();
+			
+		} catch (NullPointerException e) {
+			// Affichage de l'erreur dans la console sans faire crasher le programme
+			System.err.println("Erreur : l'acheteur est null.");
+			return "";
 		}
-		return null;
 	}
 
 	public boolean contientProduit(String produit) {
